@@ -18,8 +18,9 @@ app.get('/',(require,response)=>{
     response.sendFile(__dirname + '/public/index.html');
 })
 app.use('/',express.static('public'));
+
 // 建立TCP连接 获取机器数据
-/*var HOST = '211.67.21.100';
+var HOST = '192.168.43.250';
 var PORT = 29999;
 var result;
 
@@ -29,19 +30,22 @@ client.connect(PORT, HOST,()=>{
 });
 
 client.on('data',data =>{
-    console.log(data);
+   // console.log(data);
     console.log(data.toString('ascii'));
-    io.emit('data',parseFloat(data.toString('ascii')));
+    var result = data.toString('ascii').split(',');
+    result = result.map(v=>parseFloat(v));
+    console.log(result);
+    io.emit('data',result);
 })
-setInterval(()=>{
-    io.emit('data',Math.random());
-})
+
 
 
 client.on('close', function() {
     console.log('Connection closed');
 });
-*/
+
+/*
 setInterval(()=>{
     io.emit('data',Math.random());
 },1000);
+*/

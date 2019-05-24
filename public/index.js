@@ -5,11 +5,34 @@ Highcharts.setOptions({
 		useUTC: false
 	}
 });
+
 function activeLastPointToolip(chart) {
 	var points = chart.series[0].points;
 	chart.tooltip.refresh(points[points.length -1]);
 }
-var chart = Highcharts.chart('container', {
+
+const types = ['燃烧室压力','燃烧室温度','弹体壁面温度','排气管温度','喷油器温度'];
+const title = ['压力/bar','温度/°C','温度/°C','温度/°C','温度/°C'];
+const eleName = ''
+var charts = [];
+types.forEach((v,index)=>{
+	charts.push(createChart('container'+index,v,title[index]));
+})
+
+socket.on('data',(data)=>{
+	charts.forEach((chart,type) => {
+		document.getElementsByClassName('data')[type].innerText = data[type];
+		console.log(data);
+		var x = (new Date()).getTime(),
+			y = data[type];
+		chart.series[0].addPoint([x, y], true, true);
+		activeLastPointToolip(chart);
+	});
+	
+})
+
+function createChart(eleId,title,yName)
+{ return Highcharts.chart(eleId, {
 	chart: {
 		type: 'spline',
 		marginRight: 10,
@@ -19,17 +42,12 @@ var chart = Highcharts.chart('container', {
 					chart = this;
 				console.log(this);
 				activeLastPointToolip(chart);
-				socket.on('data',(data)=>{
-					var x = (new Date()).getTime(),
-						y = data;
-					series.addPoint([x, y], true, true);
-					activeLastPointToolip(chart);
-				})
+				
 			}
 		}
 	},
 	title: {
-		text: '燃烧室温度'
+		text: title
 	},
 	xAxis: {
 		type: 'datetime',
@@ -40,21 +58,13 @@ var chart = Highcharts.chart('container', {
 	},
 	yAxis: {
 		title: {
-			text: '温度'
+			text: yName,
 		}
 	},
-	tooltip: {
-		formatter: function () {
-			return '<b>' + this.series.name + '</b><br/>' +
-				Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-				Highcharts.numberFormat(this.y, 4);
-		}
-	},
-	legend: {
-		enabled: false
-	},
+	
+	
 	series: [{
-		name: '温度',
+		showInLegend: false,
 		data: (function () {
 			// 初始化
 			var data = [],
@@ -62,11 +72,15 @@ var chart = Highcharts.chart('container', {
 				i;
 			for (i = -19; i <= 0; i += 1) {
 				data.push({
-					x: time + i * 1000,
+					x: time + i * 200,
 					y: 0
 				});
 			}
 			return data;
-		}())
+		}()),
+		marker: {
+			enabled: false
+		},
 	}]
 });
+}
