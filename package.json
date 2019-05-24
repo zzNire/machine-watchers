@@ -1,0 +1,13 @@
+{
+    "name": "machine-watchers",
+    "version": "0.0.1",
+    "description": "show latest data of machine",
+    "dependencies": {
+        "express": "^4.15.2",
+        "socket.io": "^2.2.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/zzNire/machine-watchers"
+    }
+}
